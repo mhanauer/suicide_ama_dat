@@ -21,10 +21,42 @@ dat_suicide$A294_Q95 = NULL
 ```
 Rename the variables
 ```{r}
+library(prettyR)
+apply(dat_suicide, 2, function(x){describe.factor(x)})
+```
+
+```{r}
 head(dat_suicide)
 names_original = names(dat_suicide)
 names(dat_suicide) = c("Client_ASSESS_Date", "AgeAtAdmission", "NUM_PriorReported_MH_TreatmentInstance", "non_hetero", "non_white", "female", "current_past_alcohol", "struggle_other_addictions", "past_sub_treat", "client_children", "parent_partner_support", "supporter_sub_abuse", "friends_easy", "main_relationships_others", "religous_beliefs", "cultural_beliefs", "Edu", "future_edu_goals", "vision_barriers", "hearing_barriers", "short_attention_span", "speech_barriers", "cognitive_barriers", "reading_barriers", "writing_barriers", "physical_barriers", "currently_employed", "work_sub_problems", "money_support", "current_finance_sit", "veteran", "combat", "charged_crime", "court_convictions", "dui", "legal_cit", "treatment_court_ordered", "belief_sub_use_impact_legal_issues", "mental_health_other_provider","current_mental_health_treat", "past_thought_suicide", "attempted_suicide", "current_thoughts_suicide", "motivation_die_suicide", "risky_behavior", "non_suicide_self_injury", "past_violent_behavior", "past_thought_homocide", "current_thought_homocide", "witnessed_trauma", "history_trauma", "sig_loss", "readiness_change", "self_relpase", "threats_client_safety", "stable_living", "polysubstance_use")
 dat_suicide
+```
+Set up the imputation
+```{r}
+library(Amelia)
+#impute_dat_suicide = amelia(x = dat_suicide, m = 10, noms = c("non_hetero", "non_white", "female", "current_past_alcohol", "struggle_other_addictions", "past_sub_treat", "client_children", "parent_partner_support", "supporter_sub_abuse", "friends_easy", "main_relationships_others", "religous_beliefs", "cultural_beliefs", "vision_barriers", "hearing_barriers", "short_attention_span", "speech_barriers", "cognitive_barriers", "reading_barriers", "writing_barriers", "physical_barriers", "currently_employed", "work_sub_problems", "money_support", "current_finance_sit", "veteran", "combat", "charged_crime", "court_convictions", "dui", "legal_cit", "treatment_court_ordered", "belief_sub_use_impact_legal_issues", "mental_health_other_provider","current_mental_health_treat", "past_thought_suicide", "attempted_suicide", "current_thoughts_suicide", "motivation_die_suicide", "risky_behavior", "non_suicide_self_injury", "past_violent_behavior", "past_thought_homocide", "current_thought_homocide", "witnessed_trauma", "history_trauma", "sig_loss", "threats_client_safety", "stable_living", "polysubstance_use"), logs = c("NUM_PriorReported_MH_TreatmentInstance"))
+
+#saveRDS(impute_dat_suicide, file = "impute_dat_suicide.rds")
+setwd("S:/Indiana Research & Evaluation/Matthew Hanauer/AMAData")
+impute_dat_suicide = readRDS(file = "impute_dat_suicide.rds")
+impute_dat_suicide = impute_dat_suicide$imputations
+```
+Get the averages and then change for non-binary and then get averages for rest
+```{r}
+### numeric Client_ASSESS_Date, AgeAtAdmission, NUM_PriorReported_MH_TreatmentInstance, future_edu_goals, readiness_change, readiness_change, EDU
+impute_dat_suicide = impute_dat_suicide[[1]]+impute_dat_suicide[[2]]+impute_dat_suicide[[3]]+impute_dat_suicide[[4]]+impute_dat_suicide[[5]]
+
+impute_dat_suicide[,-c(1,2,3,17, 18, 53, 54)] = apply(impute_dat_suicide[,c(-c(1,2,3,17, 18, 53, 54))], 2, function(x){ifelse(x >= 2.5, 1, 0)})
+
+impute_dat_suicide[,c(1,2,3,17, 18, 53, 54)] = apply(impute_dat_suicide[,c(1,2,3,17, 18, 53, 54)], 2, function(x){as.factor(x)})
+
+### Now divide each value by 10
+impute_dat_suicide[,c(1,2,3,17, 18, 53, 54)] = apply(impute_dat_suicide[,c(1,2,3,17, 18, 53, 54)], 2, function(x){as.numeric(x)})
+impute_dat_suicide[,c(1,2,3,17, 18, 53, 54)] = impute_dat_suicide[,c(1,2,3,17, 18, 53, 54)] / 10
+impute_dat_suicide
+### Get rid of the x's
+write.csv(impute_dat_suicide, "impute_dat_suicide.csv", row.names = FALSE)
+
 ```
 
 
