@@ -1,0 +1,30 @@
+---
+title: "AMA Results"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Load in data
+```{r}
+setwd("S:/Indiana Research & Evaluation/Matthew Hanauer/AMAData")
+dat_suicide = read.csv("dat_suicide.csv", header = TRUE, na.strings = c(" "))
+head(dat_suicide)
+library(naniar)
+miss_var_summary(dat_suicide)
+### Drop A294_Q95 too much missing data
+dat_suicide$X = NULL
+dat_suicide$A294_Q95 = NULL
+```
+Rename the variables
+```{r}
+head(dat_suicide)
+names_original = names(dat_suicide)
+names(dat_suicide) = c("Client_ASSESS_Date", "AgeAtAdmission", "NUM_PriorReported_MH_TreatmentInstance", "non_hetero", "non_white", "female", "current_past_alcohol", "struggle_other_addictions", "past_sub_treat", "client_children", "parent_partner_support", "supporter_sub_abuse", "friends_easy", "main_relationships_others", "religous_beliefs", "cultural_beliefs", "Edu", "future_edu_goals", "vision_barriers", "hearing_barriers", "short_attention_span", "speech_barriers", "cognitive_barriers", "reading_barriers", "writing_barriers", "physical_barriers", "currently_employed", "work_sub_problems", "money_support", "current_finance_sit", "veteran", "combat", "charged_crime", "court_convictions", "dui", "legal_cit", "treatment_court_ordered", "belief_sub_use_impact_legal_issues", "mental_health_other_provider","current_mental_health_treat", "past_thought_suicide", "attempted_suicide", "current_thoughts_suicide", "motivation_die_suicide", "risky_behavior", "non_suicide_self_injury", "past_violent_behavior", "past_thought_homocide", "current_thought_homocide", "witnessed_trauma", "history_trauma", "sig_loss", "readiness_change", "self_relpase", "threats_client_safety", "stable_living", "polysubstance_use")
+dat_suicide
+```
+
+
