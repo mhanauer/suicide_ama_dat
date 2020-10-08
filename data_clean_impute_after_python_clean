@@ -19,7 +19,7 @@ miss_var_summary(dat_suicide)
 dat_suicide$X = NULL
 dat_suicide$A294_Q95 = NULL
 ```
-Rename the variables
+Quick descriptives
 ```{r}
 library(prettyR)
 apply(dat_suicide, 2, function(x){describe.factor(x)})
@@ -31,6 +31,37 @@ names_original = names(dat_suicide)
 names(dat_suicide) = c("Client_ASSESS_Date", "AgeAtAdmission", "NUM_PriorReported_MH_TreatmentInstance", "non_hetero", "non_white", "female", "current_past_alcohol", "struggle_other_addictions", "past_sub_treat", "client_children", "parent_partner_support", "supporter_sub_abuse", "friends_easy", "main_relationships_others", "religous_beliefs", "cultural_beliefs", "cultural_ident_issues", "future_edu_goals", "vision_barriers", "hearing_barriers", "short_attention_span", "speech_barriers", "cognitive_barriers", "reading_barriers", "writing_barriers", "physical_barriers", "currently_employed", "work_sub_problems", "money_support", "current_finance_sit", "veteran", "combat", "charged_crime", "court_convictions", "dui", "legal_cit", "treatment_court_ordered", "belief_sub_use_impact_legal_issues", "mental_health_other_provider", "past_thought_suicide", "attempted_suicide", "current_thoughts_suicide", "motivation_die_suicide", "risky_behavior", "non_suicide_self_injury", "past_violent_behavior", "past_thought_homocide", "current_thought_homocide", "witnessed_trauma", "history_trauma", "sig_loss", "readiness_change", "self_relpase", "threats_client_safety", "stable_living", "polysubstance_use")
 dat_suicide
 ```
+Get the total amount of missing data and n
+```{r}
+library(naniar)
+miss_var_summary(dat_suicide)
+prop_miss_case(dat_suicide)
+dim(dat_suicide)[1]
+dim(dat_suicide)
+.20-.008
+-.07+-.02+-.01*2+-.07
+```
+Get participants characteristics 
+```{r}
+dat_suicide[,-c(1,2,3, 52, 53)] = apply(dat_suicide[,-c(1,2,3, 52, 53)], 2, function(x){as.factor(x)})
+
+part_charac =  prettyR::describe(dat_suicide)
+num_charac = data.frame(part_charac$Numeric)
+num_charac = num_charac[c(1,4),]
+num_charac = t(num_charac)
+num_charac = round(num_charac,2) 
+
+write.csv(num_charac, "num_charac.csv")
+
+fac_charac = data.frame(part_charac$Factor)
+fac_charac = round(fac_charac,2)
+fac_charac = t(fac_charac)
+write.csv(fac_charac, "fac_charac.csv")
+
+```
+
+
+
 Set up the imputation
 ```{r}
 library(Amelia)
@@ -38,8 +69,18 @@ library(Amelia)
 #saveRDS(impute_dat_suicide, file = "impute_dat_suicide.rds")
 setwd("S:/Indiana Research & Evaluation/Matthew Hanauer/AMAData")
 impute_dat_suicide = readRDS(file = "impute_dat_suicide.rds")
+review_dat= impute_dat_suicide
 impute_dat_suicide = impute_dat_suicide$imputations
 ```
+Check out the diagnostics
+```{r}
+compare.density(review_dat, var = "belief_sub_use_impact_legal_issues")
+compare.density(review_dat, var = "cultural_ident_issues")
+compare.density(review_dat, var = "cultural_beliefs")
+compare.density(review_dat, var = "attempted_suicide")
+```
+
+
 Get the averages and then change for non-binary and then get averages for rest
 ```{r}
 ### numeric Client_ASSESS_Date, AgeAtAdmission, NUM_PriorReported_MH_TreatmentInstance, future_edu_goals, readiness_change, readiness_change, EDU
